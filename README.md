@@ -1,2 +1,2 @@
 # lesson_16
-Module tests
+Learning module tests
