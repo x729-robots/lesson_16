@@ -2,14 +2,16 @@
 
 #include <gtest/gtest.h>
 
-TEST(list, Empty) {
+TEST(list,
+
+     Empty) {
     // Arrange
     std::list<int> list;
 
     // Act (empty for this test)
-
     // Assert
     ASSERT_EQ(list.size(), static_cast<size_t>(0));
+
     ASSERT_TRUE(list.empty());
 }
 
@@ -29,7 +31,7 @@ TEST(list, PushBack) {
 }
 
 TEST(Lst, PopBack) {
-    // Arrange 
+    // Arrange
     const size_t count = 10;
     std::list<size_t> list;
 
