@@ -2,9 +2,9 @@
 
 #include <gtest/gtest.h>
 
-TEST(List, Empty) {
+TEST(list, Empty) {
     // Arrange
-    otus::List<int> list;
+    std::list<int> list;
 
     // Act (empty for this test)
 
@@ -13,10 +13,10 @@ TEST(List, Empty) {
     ASSERT_TRUE(list.empty());
 }
 
-TEST(List, PushBack) {
+TEST(list, PushBack) {
     // Arrange
     const size_t count = 10;
-    otus::List<size_t> list;
+    std::list<size_t> list;
 
     // Act
     for (size_t i = 0; i < count; ++i) {
@@ -31,7 +31,7 @@ TEST(List, PushBack) {
 TEST(Lst, PopBack) {
     // Arrange 
     const size_t count = 10;
-    otus::List<size_t> list;
+    std::list<size_t> list;
 
     for (size_t i = 0; i < count; ++i) {
         list.push_back(i);
