@@ -11,6 +11,7 @@ add_executable(
     test/test_list.cpp
 )
 
+message(QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ)
 message(STATUS ${GTEST_INCLUDE_DIRS})
 message(STATUS ${GTEST_BOTH_LIBRARIES})
 
@@ -27,6 +28,8 @@ target_link_libraries(
 )
 
 set_target_properties(test_list PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON)
+
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
 if (MSVC)
     target_compile_options(
