@@ -8,10 +8,10 @@ find_package(GTest)
 # Test target
 add_executable(
     test_list
-    test/test_list.cpp
+    test/tests_container.hpp
+    test/containers_tests.cpp
 )
 
-message(QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ)
 message(STATUS ${GTEST_INCLUDE_DIRS})
 message(STATUS ${GTEST_BOTH_LIBRARIES})
 
