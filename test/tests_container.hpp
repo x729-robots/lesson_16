@@ -1,11 +1,12 @@
 #include <algorithm>
 
-#if TEST_CONTAINER == LIST
+#include <vector>
 #include <list>
+
+#if TEST_CONTAINER == LIST
 template<typename T> 
 using container = std::list<T>;
 #elif TEST_CONTAINER == VECTOR
-#include <vector>
 template<typename T> 
 using container = std::vector<T>;
 #endif
@@ -16,7 +17,6 @@ using container = std::vector<T>;
 //#define DEBUG_OUT
 
 struct BaseContainerFixture : public testing::Test {
-
     // Arrange
     static const size_t numsCount = 5;
 

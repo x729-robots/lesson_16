@@ -1,7 +1,8 @@
 #define VECTOR 0
 #define LIST 1
-#define TEST_CONTAINER LIST
 
+
+#define TEST_CONTAINER VECTOR
 #include "tests_container.hpp"
 
 int main(int argc, char** argv) {
