@@ -12,13 +12,11 @@ add_executable(
     test/containers_tests.cpp
     test/tests_list.cpp
     test/tests_vector.cpp
-    test/include/tests_list.h
-    test/include/tests_vector.h
 )
 
 message(STATUS ${GTEST_INCLUDE_DIRS})
 message(STATUS ${GTEST_BOTH_LIBRARIES})
-
+message(===============)
 # Add googletest to the include directories for the test target
 target_include_directories(
     test_list PRIVATE
@@ -29,6 +27,7 @@ target_include_directories(
 # Link test target against gtest libraries
 target_link_libraries(
     test_list PRIVATE
+    ${GTEST_LIBRARIES}
     ${GTEST_BOTH_LIBRARIES}
 )
 
