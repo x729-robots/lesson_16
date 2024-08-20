@@ -1,68 +1,16 @@
 #include <algorithm>
 
-#include <vector>
-#include <list>
-
-#if TEST_CONTAINER == LIST
-template<typename T> 
-using container = std::list<T>;
-#elif TEST_CONTAINER == VECTOR
-template<typename T> 
-using container = std::vector<T>;
-#endif
-
-
 #include <gtest/gtest.h>
-
-//#define DEBUG_OUT
-
-struct BaseContainerFixture : public testing::Test {
-    // Arrange
-    static const size_t numsCount = 5;
-
-    // Arrange
-    const int nums[numsCount];
-
-    BaseContainerFixture() : nums{2, 0, 6, -14, 5} {}
-
-    // Per-test-suite set-up.
-    static void SetUpTestSuite() {
-        std::cout << "SetUpTestSuite" << std::endl;
-    }
-
-    // Per-test-suite tear-down.
-    static void TearDownTestSuite() {
-        std::cout << "TearDownTestSuite" << std::endl;
-    }
-
-    // Per-test set-up
-    void SetUp() override {
-        std::cout << "SetUp" << std::endl;
-    }
-
-    // You can define per-test tear-down logic as usual.
-    void TearDown() override {
-        std::cout << "TearDown" << std::endl;
-        // Nothing to do for now
-    }
-};
 
 //сравнение данных листа и массива
 template <typename T>
-bool checkContainerDataWithArray(const container <T> & container, const T* array,
+bool checkContainerDataWithArray(const __Container__ <T> & container, const T* array,
                             size_t array_len) {
     int index = 0;
     if (container.size() != array_len) {
-#ifdef DEBUG_OUT
-        std::cout << "Bad size..." << std::endl;
-#endif
         return false;
     }
     for (auto const& elem : container) {
-#ifdef DEBUG_OUT
-        std::cout << "elem == " << elem << " ,"
-                  << "array[index] == " << array[index] << std::endl;
-#endif
         if (elem != array[index]) {
             return false;
         }
@@ -71,12 +19,10 @@ bool checkContainerDataWithArray(const container <T> & container, const T* array
     return true;
 }
 
-struct CreateContainerFixture : public BaseContainerFixture {};
-
 //тест на создание контейнера пустого
-TEST_F(CreateContainerFixture, Empty) {
+TEST(__CreateContainer__, Empty) {
     // Act (empty for this test)
-    container<int> container;
+    __Container__<int> container;
 
     // Assert
     ASSERT_EQ(container.size(), static_cast<size_t>(0));
@@ -85,9 +31,13 @@ TEST_F(CreateContainerFixture, Empty) {
 
 //TODO тест на вызов и уничтожение деструктора сделать: т.е. повесить mock????
 //тест на создание контейнера непустого с инициализацией массивом
-TEST_F(CreateContainerFixture, fromArray) {
+TEST(__CreateContainer__, fromArray) {
+    // Arrange
+    static const size_t numsCount = 5;
+    const int nums[numsCount] = {2, 0, 6, -14, 5};
+
     // Act (empty for this test)
-    container<int> container{nums, nums + numsCount};
+    __Container__<int> container{nums, nums + numsCount};
 
     // Assert
     ASSERT_EQ(container.size(), static_cast<size_t>(numsCount));
@@ -96,10 +46,10 @@ TEST_F(CreateContainerFixture, fromArray) {
 }
 
 //тест на: вставка элементов в конец
-TEST(AddToContainer, PushBack) {
+TEST(__AddToContainer__, PushBack) {
     // Arrange
     const size_t count = 10;
-    container<size_t> container;
+    __Container__<size_t> container;
     size_t array[count];
     // Act
     for (size_t i = 0; i < count; ++i) {
@@ -112,7 +62,7 @@ TEST(AddToContainer, PushBack) {
     ASSERT_FALSE(container.empty());
     ASSERT_TRUE(checkContainerDataWithArray(container, array, count));
 }
-
+/*TODO
 #ifdef TEST_LIST
 //тест на: вставка элементов в начало
 TEST(AddToContainer, PushFront) {
@@ -132,12 +82,12 @@ TEST(AddToContainer, PushFront) {
     ASSERT_TRUE(checkContainerDataWithArray(container, array, count));
 }
 #endif
-
+*/
 //тест на: вставка элементов в начало
-TEST(AddToContainer, InsertFront) {
+TEST(__AddToContainer__, InsertFront) {
     // Arrange
     const size_t count = 10;
-    container<size_t> container;
+    __Container__<size_t> container;
     size_t array[count];
     // Act
     for (size_t i = 0; i < count; ++i) {
@@ -152,10 +102,10 @@ TEST(AddToContainer, InsertFront) {
 }
 
 //тест на: вставка элементов в середину
-TEST(AddToContainer, PushMiddle) {
+TEST(__AddToContainer__, PushMiddle) {
     // Arrange
     const size_t count = 10;
-    container<size_t> container;
+    __Container__<size_t> container;
     size_t arrayFirst[count];
     size_t insertValue = 111;
     const size_t insert_length = 1;
@@ -188,11 +138,11 @@ TEST(AddToContainer, PushMiddle) {
 }
 
 //тест на: удаление элементов из конца
-TEST(DeleteFromContainer, PopBack) {
+TEST(__DeleteFromContainer__, PopBack) {
     // Arrange
     const size_t count = 10;
     const size_t count_pop_back = 4;
-    container<size_t> container;
+    __Container__<size_t> container;
 
     size_t array[count];
 
@@ -212,6 +162,7 @@ TEST(DeleteFromContainer, PopBack) {
     ASSERT_TRUE(checkContainerDataWithArray(container, array, count - count_pop_back));
 }
 
+/*
 #ifdef TEST_LIST
 //тест на: удаление элементов из начала
 TEST(DeleteFromContainer, PopFront) {
@@ -238,13 +189,14 @@ TEST(DeleteFromContainer, PopFront) {
     ASSERT_TRUE(checkContainerDataWithArray(container, array+count_pop_front, count - count_pop_front));
 }
 #endif
+*/
 
 //тест на: удаление элементов из начала
-TEST(DeleteFromContainer, Erase) {
+TEST(__DeleteFromContainer__, Erase) {
     // Arrange
     const size_t count = 10;
     const size_t count_pop_front = 3;
-    container<size_t> container;
+    __Container__<size_t> container;
 
     size_t array[count];
 
@@ -265,14 +217,14 @@ TEST(DeleteFromContainer, Erase) {
 }
 
 //тест на: удаление элементов из середины
-TEST(DeleteFromContainer, EraseMiddle) {
+TEST(__DeleteFromContainer__, EraseMiddle) {
     // Arrange
     const size_t count = 5;
     const size_t res_count = 4;
     const size_t middle = 3;
     size_t array[count] = {3,2,5,7,3};
     size_t res_array[count] = {3,2,7,3};
-    container<size_t> container (array, array + count);
+    __Container__<size_t> container (array, array + count);
     auto it = container.begin();
     advance(it,middle-1);
 
@@ -286,9 +238,9 @@ TEST(DeleteFromContainer, EraseMiddle) {
 }
 
 //тест на: получение и проверку всех элементов контейнера
-TEST(GetElements, GetNext) {
+TEST(__GetElements__, GetNext) {
     // Arrange
-    container<int> container;
+    __Container__<int> container;
     for (int i = 0 ; i < 5 ; i++)
         container.push_back(i);
 
@@ -298,9 +250,9 @@ TEST(GetElements, GetNext) {
 }
 
 //тест на получение размера контейнера
-TEST(GetProperties, GetSize) {
+TEST(__GetProperties__, GetSize) {
     // Act
-    container<int> container{0,0,0,0,0};
+    __Container__<int> container{0,0,0,0,0};
 
     // Assert
     ASSERT_EQ(container.size(), static_cast<size_t>(5));
