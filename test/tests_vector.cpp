@@ -7,7 +7,7 @@
 #define __GetElements__ GetElementsFromVector
 #define __GetProperties__ GetPropertiesFromVector
 #define __Container__ std::vector
-#include "tests_container.hpp"
+#include "tests_abstract_container.hpp"
 
 int tests_vector(int argc, char** argv) {
     testing::InitGoogleTest(&argc, argv);
