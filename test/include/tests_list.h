@@ -1,0 +1,1 @@
+int tests_vector(int argc, char** argv);
