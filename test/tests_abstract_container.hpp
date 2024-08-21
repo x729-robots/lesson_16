@@ -226,7 +226,8 @@ TEST(__SuitName__, CopyContaner) {
     for (int i = 0; i < 5; i++)
         ASSERT_EQ(*it++, i);
 }
-class CTestInterface {
+
+struct CTestInterface {
   public:
     virtual void constructorCalled() = 0;
     virtual void destructorCalled() = 0;
@@ -247,11 +248,11 @@ class CTest {
     int item;
 };
 
-using testing::AtLeast;
-using testing::AtMost;
-using testing::Return;
-using testing::_;
-using ::testing::InSequence;
+//using testing::AtLeast;
+//using testing::AtMost;
+//using testing::Return;
+//using testing::_;
+//using ::testing::InSequence;
 
 // gmock object implementation
 struct MockCTest : CTestInterface {
@@ -260,15 +261,17 @@ struct MockCTest : CTestInterface {
     MOCK_METHOD(void, destructorCalled, (), (override));
 };
 
+using ::testing::NiceMock;
+
 //тест: удаление контейнера (Дополнительное задание 2)
 TEST(__SuitName__, DeleteContaner) {
     // Arrange
-    //MockCTest m_mockCTest;
+    NiceMock<MockCTest> m_mockCTest;
     __Container__<CTest> container1;
-    //for (int i = 0; i < 3; i++)
-      //  container1.push_back(CTest(0,&m_mockCTest));
+    for (int i = 0; i < 3; i++)
+        container1.push_back(CTest(0,&m_mockCTest));
 
-    //EXPECT_CALL(m_mockCTest, constructorCalled()).Times(AtLeast(3));
-    //EXPECT_CALL(m_mockCTest, destructorCalled()).Times(AtLeast(3));
     // Assert    
+    EXPECT_CALL(m_mockCTest, constructorCalled()).Times(0);
+    EXPECT_CALL(m_mockCTest, destructorCalled()).Times(3);
 }
