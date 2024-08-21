@@ -271,12 +271,17 @@ TEST(__SuitName__, DeleteContaner) {
 
 class CTestMove {
   public:
-    explicit CTestMove() {
+    CTestMove() {
         // callNumber=riseCallNumber();
         static int item = 0;
         item++;
         callNumber = &item;
         std::cout << "============" << "CONSTRUCTOR______" << std::endl;
+    };
+    CTestMove(const CTestMove& other) {
+        this->callNumber = other.callNumber;
+        this->v = other.v;
+        std::cout << "============" << "COPY CONSTRUCTOR______" << std::endl;
     };
     ~CTestMove(){};
     int getCallNumber(){
@@ -285,8 +290,8 @@ class CTestMove {
     // int * riseCallNumber(){
     //
     //}
-  private:
     int* callNumber;
+    std::vector<int> v;
 };
 
 //тест: проверка работы перемещающего оператора присваивания
@@ -304,7 +309,7 @@ TEST(__SuitName__, MoveContaner) {
     // Action
     container2 = container1; //check copy operator
 
-    std::cout << "============" << container2.begin()->getCallNumber() << std::endl;
+    //std::cout << "============" << container2.begin()->getCallNumber() << std::endl;
 
     // Action
     // container3 = std::move(container2); //check copy operator
