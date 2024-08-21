@@ -31,9 +31,10 @@ target_link_libraries(
 
 set_target_properties(test_list PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON)
 
+
 target_compile_options(
     test_list PRIVATE
-        -Wall -Wextra -pedantic -Werror
+        -Wall -Wextra -pedantic -Werror -O
     )
 
 #message(STATUS ${GTEST_INCLUDE_DIRS})

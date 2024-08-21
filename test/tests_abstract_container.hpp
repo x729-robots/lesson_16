@@ -1,6 +1,6 @@
 #include <algorithm>
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 //сравнение данных листа и массива
 template <typename T>
@@ -227,7 +227,7 @@ TEST(__SuitName__, CopyContaner) {
         ASSERT_EQ(*it++, i);
 }
 
-struct CTestInterface {
+struct CDestructorInterface {
   public:
     virtual void constructorCalled() = 0;
     virtual void destructorCalled() = 0;
@@ -235,29 +235,22 @@ struct CTestInterface {
 
 class CTest {
   public:
-    CTest(int value, CTestInterface* m_interface)
+    CTest(int value, CDestructorInterface* m_interface)
         : m_interface(m_interface), item(value) {
         m_interface->constructorCalled();
     };
     ~CTest() {
         m_interface->destructorCalled();
     };
-    CTestInterface* m_interface;
+    CDestructorInterface* m_interface;
 
   private:
     int item;
 };
 
-//using testing::AtLeast;
-//using testing::AtMost;
-//using testing::Return;
-//using testing::_;
-//using ::testing::InSequence;
-
 // gmock object implementation
-struct MockCTest : CTestInterface {
+struct MockCTest : CDestructorInterface {
     MOCK_METHOD(void, constructorCalled, (), (override));
-
     MOCK_METHOD(void, destructorCalled, (), (override));
 };
 
@@ -269,9 +262,55 @@ TEST(__SuitName__, DeleteContaner) {
     NiceMock<MockCTest> m_mockCTest;
     __Container__<CTest> container1;
     for (int i = 0; i < 3; i++)
-        container1.push_back(CTest(0,&m_mockCTest));
+        container1.push_back(CTest(0, &m_mockCTest));
 
-    // Assert    
+    // Assert
     EXPECT_CALL(m_mockCTest, constructorCalled()).Times(0);
     EXPECT_CALL(m_mockCTest, destructorCalled()).Times(3);
+}
+
+class CTestMove {
+  public:
+    explicit CTestMove() {
+        // callNumber=riseCallNumber();
+        static int item = 0;
+        item++;
+        callNumber = &item;
+        std::cout << "============" << "CONSTRUCTOR______" << std::endl;
+    };
+    ~CTestMove(){};
+    int getCallNumber(){
+        return *callNumber;
+    }
+    // int * riseCallNumber(){
+    //
+    //}
+  private:
+    int* callNumber;
+};
+
+//тест: проверка работы перемещающего оператора присваивания
+TEST(__SuitName__, MoveContaner) {
+    // Arrange
+    CTestMove m_testmove_1;
+    CTestMove m_testmove_2;
+    __Container__<CTestMove> container1;
+    __Container__<CTestMove> container2;
+    __Container__<CTestMove> container3;
+
+    container1.push_back(std::move(m_testmove_1));
+    container1.push_back(m_testmove_2);
+
+    // Action
+    container2 = container1; //check copy operator
+
+    std::cout << "============" << container2.begin()->getCallNumber() << std::endl;
+
+    // Action
+    // container3 = std::move(container2); //check copy operator
+
+    // Assert
+    // EXPECT_CALL(m_mockCTest, constructorCalled()).Times(3);
+    // EXPECT_CALL(m_mockCTest_1, destructorCalled()).Times(2);
+    // EXPECT_CALL(m_mockCTest_2, destructorCalled()).Times(2);
 }
