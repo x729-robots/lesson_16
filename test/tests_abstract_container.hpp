@@ -227,30 +227,32 @@ TEST(__SuitName__, CopyContaner) {
         ASSERT_EQ(*it++, i);
 }
 
-struct CDestructorInterface {
+struct CTestInterface {
   public:
     virtual void constructorCalled() = 0;
+    virtual void copyConstructorCalled() = 0;
     virtual void destructorCalled() = 0;
 };
 
 class CTest {
   public:
-    CTest(int value, CDestructorInterface* m_interface)
+    CTest(int value, CTestInterface* m_interface)
         : m_interface(m_interface), item(value) {
         m_interface->constructorCalled();
     };
     ~CTest() {
         m_interface->destructorCalled();
     };
-    CDestructorInterface* m_interface;
+    CTestInterface* m_interface;
 
   private:
     int item;
 };
 
 // gmock object implementation
-struct MockCTest : CDestructorInterface {
+struct MockCTest : CTestInterface {
     MOCK_METHOD(void, constructorCalled, (), (override));
+    MOCK_METHOD(void, copyConstructorCalled, (), (override));
     MOCK_METHOD(void, destructorCalled, (), (override));
 };
 
@@ -265,57 +267,79 @@ TEST(__SuitName__, DeleteContaner) {
         container1.push_back(CTest(0, &m_mockCTest));
 
     // Assert
-    EXPECT_CALL(m_mockCTest, constructorCalled()).Times(0);
     EXPECT_CALL(m_mockCTest, destructorCalled()).Times(3);
 }
 
+typedef __Container__<int>
+    dummy; // NOTE: шаблонный тип dummy нужен только для того, что бы для
+           // каждого файла тестов конкретного контейнера компилятор
+           // инстанцировал отдельный класс CTestMove<dummy> со своей версией
+           // статической переменной item в конструкторе
+template <typename dummy> 
 class CTestMove {
   public:
-    CTestMove() {
-        // callNumber=riseCallNumber();
-        static int item = 0;
-        item++;
-        callNumber = &item;
-        std::cout << "============" << "CONSTRUCTOR______" << std::endl;
+    // constructor
+    CTestMove(CTestInterface* m_interface):m_interface(m_interface) {
+        calc_static_counter();
+        m_interface->constructorCalled();
+        std::cout << "============"
+                  << "CONSTRUCTOR______" << std::endl;
     };
-    CTestMove(const CTestMove& other) {
-        this->callNumber = other.callNumber;
+
+    // copy constructor
+    CTestMove(const CTestMove& other): m_interface(other.m_interface) {
+        calc_static_counter();
+        // this->callNumber = other.callNumber;
         this->v = other.v;
-        std::cout << "============" << "COPY CONSTRUCTOR______" << std::endl;
+        m_interface->copyConstructorCalled();
+        std::cout << "============"
+                  << "COPY CONSTRUCTOR______" << std::endl;
     };
-    ~CTestMove(){};
-    int getCallNumber(){
-        return *callNumber;
-    }
-    // int * riseCallNumber(){
-    //
-    //}
+
+    // copy assignment
+    CTestMove& operator=(const CTestMove& other) {
+        std::cout << "============"
+                  << "COPY assignment______" << std::endl;
+        return *this = other;
+    };
+
+    ~CTestMove() {
+        std::cout << "============"
+                  << "DESTRUCTOR______" << std::endl;
+        m_interface->destructorCalled();
+    };
+    int getCallNumber() {   // debug
+        return *callNumber; // debug
+    }                       // debug
+    std::array<int, 3> v{1, 2, 3};
+    CTestInterface* m_interface;
+
+  private:
     int* callNumber;
-    std::vector<int> v;
+    void calc_static_counter(){
+        static int item = 0; // debug
+        item++;              // debug
+        callNumber = &item;  // debug
+    }
 };
 
-//тест: проверка работы перемещающего оператора присваивания
+//тест: проверка вызова копирующего контейнера
 TEST(__SuitName__, MoveContaner) {
     // Arrange
-    CTestMove m_testmove_1;
-    CTestMove m_testmove_2;
-    __Container__<CTestMove> container1;
-    __Container__<CTestMove> container2;
-    __Container__<CTestMove> container3;
-
-    container1.push_back(std::move(m_testmove_1));
-    container1.push_back(m_testmove_2);
-
-    // Action
-    container2 = container1; //check copy operator
-
-    //std::cout << "============" << container2.begin()->getCallNumber() << std::endl;
-
-    // Action
-    // container3 = std::move(container2); //check copy operator
-
+    NiceMock<MockCTest> m_mockCTest;
+    
     // Assert
-    // EXPECT_CALL(m_mockCTest, constructorCalled()).Times(3);
-    // EXPECT_CALL(m_mockCTest_1, destructorCalled()).Times(2);
-    // EXPECT_CALL(m_mockCTest_2, destructorCalled()).Times(2);
+    EXPECT_CALL(m_mockCTest, constructorCalled()).Times(1);
+    EXPECT_CALL(m_mockCTest, copyConstructorCalled()).Times(2);
+    EXPECT_CALL(m_mockCTest, destructorCalled()).Times(3);
+
+    __Container__<CTestMove<dummy>> container1;
+    __Container__<CTestMove<dummy>> container2;
+    __Container__<CTestMove<dummy>> container3;
+    
+    // Action
+    CTestMove<dummy> m_testmove_1(&m_mockCTest); //constructor first call for CTestMove<dummy>
+    container1.push_back(m_testmove_1); //copy constructor first call for CTestMove<dummy>
+    container2 = container1; // check copy operator -  second call of copy constructor for CTestMove<dummy>
+    container3 = std::move(container1); //move container content to another container without construct new container members - no constructor must called for CTestMove<dummy>
 }

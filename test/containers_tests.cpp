@@ -1,3 +1,4 @@
+#include <array>
 #include "tests_list.h"
 #include "tests_vector.h"
 #include <gtest/gtest.h>
