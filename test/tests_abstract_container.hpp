@@ -234,13 +234,13 @@ struct CTestInterface {
     virtual void destructorCalled() = 0;
 };
 
-class CTest {
+class CTestDeleteContainer {
   public:
-    CTest(int value, CTestInterface* m_interface)
+    CTestDeleteContainer(int value, CTestInterface* m_interface)
         : m_interface(m_interface), item(value) {
         m_interface->constructorCalled();
     };
-    ~CTest() {
+    ~CTestDeleteContainer() {
         m_interface->destructorCalled();
     };
     CTestInterface* m_interface;
@@ -262,54 +262,53 @@ using ::testing::NiceMock;
 TEST(__SuitName__, DeleteContaner) {
     // Arrange
     NiceMock<MockCTest> m_mockCTest;
-    __Container__<CTest> container1;
+    __Container__<CTestDeleteContainer> container1;
     for (int i = 0; i < 3; i++)
-        container1.push_back(CTest(0, &m_mockCTest));
+        container1.push_back(CTestDeleteContainer(0, &m_mockCTest));
 
     // Assert
     EXPECT_CALL(m_mockCTest, destructorCalled()).Times(3);
 }
 
 typedef __Container__<int>
-    dummy; // NOTE: шаблонный тип dummy нужен только для того, что бы для
+    dummy; // debug: шаблонный тип dummy нужен только для того, что бы для
            // каждого файла тестов конкретного контейнера компилятор
            // инстанцировал отдельный класс CTestMove<dummy> со своей версией
-           // статической переменной item в конструкторе
-template <typename dummy> 
-class CTestMove {
+           // статической переменной item в
+template <typename dummy> class CTestMove {
   public:
     // constructor
-    CTestMove(CTestInterface* m_interface):m_interface(m_interface) {
+    CTestMove(CTestInterface* m_interface) : m_interface(m_interface) {
         calc_static_counter();
         m_interface->constructorCalled();
-        //std::cout << "============" << "CONSTRUCTOR______" << std::endl;
     };
 
     // copy constructor
-    CTestMove(const CTestMove& other): m_interface(other.m_interface) {
+    CTestMove(const CTestMove& other) : m_interface(other.m_interface) {
         calc_static_counter();
-        // this->callNumber = other.callNumber;
         this->v = other.v;
         m_interface->copyConstructorCalled();
-        //std::cout << "============" << "COPY CONSTRUCTOR______" << std::endl;
     };
 
     ~CTestMove() {
-        //std::cout << "============" << "DESTRUCTOR______" << std::endl;
         m_interface->destructorCalled();
     };
+
+
+  private:
     int getCallNumber() {   // debug
         return *callNumber; // debug
     }                       // debug
     std::array<int, 3> v{1, 2, 3};
     CTestInterface* m_interface;
-
-  private:
     int* callNumber;
-    void calc_static_counter(){
-        static int item = 0; // debug
-        item++;              // debug
-        callNumber = &item;  // debug
+
+    // debug counter of class instanses
+    void calc_static_counter() {
+        static int item =
+            0;  // debug: function for measure number of class instances
+        item++; // debug
+        callNumber = &item; // debug
     }
 };
 
@@ -317,7 +316,7 @@ class CTestMove {
 TEST(__SuitName__, MoveContaner) {
     // Arrange
     NiceMock<MockCTest> m_mockCTest;
-    
+
     // Assert
     EXPECT_CALL(m_mockCTest, constructorCalled()).Times(1);
     EXPECT_CALL(m_mockCTest, copyConstructorCalled()).Times(2);
@@ -326,10 +325,16 @@ TEST(__SuitName__, MoveContaner) {
     __Container__<CTestMove<dummy>> container1;
     __Container__<CTestMove<dummy>> container2;
     __Container__<CTestMove<dummy>> container3;
-    
+
     // Action
-    CTestMove<dummy> m_testmove_1(&m_mockCTest); //constructor first call for CTestMove<dummy>
-    container1.push_back(m_testmove_1); //copy constructor first call for CTestMove<dummy>
-    container2 = container1; // check copy operator -  second call of copy constructor for CTestMove<dummy>
-    container3 = std::move(container1); //move container content to another container without construct new container members - no constructor must called for CTestMove<dummy>
+    CTestMove<dummy> m_testmove_1(
+        &m_mockCTest); // constructor first call for CTestMove<dummy>
+    container1.push_back(
+        m_testmove_1);       // copy constructor first call for CTestMove<dummy>
+    container2 = container1; // check copy operator -  second call of copy
+                             // constructor for CTestMove<dummy>
+    container3 =
+        std::move(container1); // move container content to another container
+                               // without construct new container members - no
+                               // constructor must called for CTestMove<dummy>
 }
