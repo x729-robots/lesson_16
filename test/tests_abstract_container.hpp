@@ -224,7 +224,7 @@ TEST(__SuitName__, CopyContaner) {
 
     auto it = container2.begin();
     for (int i = 0; i < 5; i++)
-        ASSERT_EQ(*it++, i);
+        ASSERT_EQ(*it++, i); //проверяем эквивалентность данных в двух контейнерах поэлементно
 }
 
 struct CTestInterface {
@@ -267,7 +267,7 @@ TEST(__SuitName__, DeleteContaner) {
         container1.push_back(CTestDeleteContainer(0, &m_mockCTest));
 
     // Assert
-    EXPECT_CALL(m_mockCTest, destructorCalled()).Times(3);
+    EXPECT_CALL(m_mockCTest, destructorCalled()).Times(3); //проверяем, что деструкторы вызываются при покидании области видимости столько, сколько надо
 }
 
 typedef __Container__<int>
@@ -312,7 +312,7 @@ template <typename dummy> class CTestMove {
     }
 };
 
-//тест: проверка вызова копирующего контейнера (Дополнительное задание 3)
+//тест: проверка вызова перемещающего конструктора контейнера (Дополнительное задание 3)
 TEST(__SuitName__, MoveContaner) {
     // Arrange
     NiceMock<MockCTest> m_mockCTest;
