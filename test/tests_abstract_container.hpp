@@ -282,8 +282,7 @@ class CTestMove {
     CTestMove(CTestInterface* m_interface):m_interface(m_interface) {
         calc_static_counter();
         m_interface->constructorCalled();
-        std::cout << "============"
-                  << "CONSTRUCTOR______" << std::endl;
+        //std::cout << "============" << "CONSTRUCTOR______" << std::endl;
     };
 
     // copy constructor
@@ -292,20 +291,11 @@ class CTestMove {
         // this->callNumber = other.callNumber;
         this->v = other.v;
         m_interface->copyConstructorCalled();
-        std::cout << "============"
-                  << "COPY CONSTRUCTOR______" << std::endl;
-    };
-
-    // copy assignment
-    CTestMove& operator=(const CTestMove& other) {
-        std::cout << "============"
-                  << "COPY assignment______" << std::endl;
-        return *this = other;
+        //std::cout << "============" << "COPY CONSTRUCTOR______" << std::endl;
     };
 
     ~CTestMove() {
-        std::cout << "============"
-                  << "DESTRUCTOR______" << std::endl;
+        //std::cout << "============" << "DESTRUCTOR______" << std::endl;
         m_interface->destructorCalled();
     };
     int getCallNumber() {   // debug
@@ -323,7 +313,7 @@ class CTestMove {
     }
 };
 
-//тест: проверка вызова копирующего контейнера
+//тест: проверка вызова копирующего контейнера (Дополнительное задание 3)
 TEST(__SuitName__, MoveContaner) {
     // Arrange
     NiceMock<MockCTest> m_mockCTest;
