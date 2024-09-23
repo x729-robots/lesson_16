@@ -18,7 +18,22 @@ add_subdirectory(
     "${CMAKE_CURRENT_SOURCE_DIR}/googletest" 
 )
 
-# Test target
+### Test target
+##add_executable(
+##    main_list_singly src/main_singly_list.cpp src/list_singly.hpp
+##)
+##
+### Test target
+##add_executable(
+##    main_list src/main_list.cpp src/list.hpp
+##)
+##
+### Test target
+##add_executable(
+##    main_vector src/main_vector.cpp src/vector.hpp
+##)
+
+# MODULE TESTS WITH GOOGLETEST
 add_executable(
     test_container
     test/containers_tests.cpp
